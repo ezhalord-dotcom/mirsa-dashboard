@@ -38,11 +38,39 @@ def pareto(df, cat_col, count_col, cum_col, title=""):
     return fig
 
 
+def _name(v, i):
+    """El nombre de serie debe ser texto; las referencias o listas se convierten a texto legible."""
+    if isinstance(v, (list, tuple)):
+        v = " ".join(str(x) for x in v if x not in (None, ""))
+    return str(v).strip() if v not in (None, "") else f"Serie {i + 1}"
+
+
+def _nums(vals):
+    """Valores numéricos; los textos como '3.2%  →  1.4%' se omiten en vez de romper el gráfico."""
+    out = []
+    for v in vals or []:
+        if isinstance(v, bool):
+            out.append(None)
+        elif isinstance(v, (int, float)):
+            out.append(v)
+        else:
+            try:
+                out.append(float(str(v).replace(",", "").replace("%", "")))
+            except ValueError:
+                out.append(None)
+    return out
+
+
+def _cats(cats):
+    return [str(c) if not isinstance(c, (int, float)) else c for c in (cats or [])]
+
+
 def from_chart_values(cv: dict):
     """Reconstruye un gráfico del libro (leído de su XML) como figura Plotly."""
     fig = go.Figure()
     for i, s in enumerate(cv["series"]):
         color = PALETTE[i % len(PALETTE)]
+        s = dict(s, name=_name(s.get("name"), i), vals=_nums(s["vals"]), cats=_cats(s["cats"]))
         cats = s["cats"] or list(range(1, len(s["vals"]) + 1))
         kind = s["kind"]
         if kind == "barChart":
