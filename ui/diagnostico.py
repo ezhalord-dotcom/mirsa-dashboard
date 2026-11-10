@@ -39,6 +39,6 @@ def _tabla_resumen(wb):
         theme.show_table(df, "tabla_resumen", title=f"Impacto económico por problema · {rng}")
     for ch in [c for c in wb.charts if c["sheet"] == s.name]:
         cv = chart_values(wb, ch)
-        st.plotly_chart(plots.from_chart_values(cv), use_container_width=True)
+        theme.chart(plots.from_chart_values(cv), use_container_width=True)
     theme.notice("Los valores «Valor esperado» corresponden a la referencia del libro para cada problema; "
                  "el impacto es el de la hoja, no un cálculo del dashboard.", "info")

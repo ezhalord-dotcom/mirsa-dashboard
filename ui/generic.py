@@ -1,6 +1,8 @@
 """Renderizado genérico de cualquier hoja: tablas detectadas, textos, gráficos e imágenes."""
 import streamlit as st
 
+from ui import theme
+
 from core.xlsx_reader import SheetData, Workbook, chart_values, detect_tables, long_texts
 from ui import plots
 
@@ -22,7 +24,7 @@ def render_sheet(wb: Workbook, sheet: SheetData, title: str | None = None):
         for i, ch in enumerate(charts):
             cv = chart_values(wb, ch)
             with cols[i % 2]:
-                st.plotly_chart(plots.from_chart_values(cv), use_container_width=True)
+                theme.chart(plots.from_chart_values(cv), use_container_width=True)
                 for w in cv["warnings"]:
                     st.caption(w)
 

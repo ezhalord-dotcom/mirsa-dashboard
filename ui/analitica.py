@@ -156,7 +156,7 @@ def render_obj4(wb, schema):
             p = _c(alt, "Prioridad")
             if p:
                 alt[p] = _num(alt[p])
-                st.plotly_chart(plots.bars(alt, alt.columns[0], [p], title="Prioridad de cada herramienta (AHP)"),
+                theme.chart(plots.bars(alt, alt.columns[0], [p], title="Prioridad de cada herramienta (AHP)"),
                                 use_container_width=True)
             theme.show_table(alt, "obj4_ahp_alternativas", title="Comparación MRP vs ROP (AHP)")
         else:
@@ -167,7 +167,7 @@ def render_obj4(wb, schema):
             w = _c(pesos, "Peso")
             if w:
                 pesos[w] = _num(pesos[w])
-                st.plotly_chart(plots.bars(pesos, pesos.columns[0], [w], title="Ponderación de los criterios"),
+                theme.chart(plots.bars(pesos, pesos.columns[0], [w], title="Ponderación de los criterios"),
                                 use_container_width=True)
             theme.show_table(pesos, "obj4_ahp_pesos", title="Criterios y ponderaciones")
         theme.notice("Pesos y prioridades tomados del libro (AHP). No se recalculan en el dashboard.", "info")
@@ -184,7 +184,7 @@ def render_obj4(wb, schema):
                 b[sf] = _num(b[sf])
                 b[ta] = _num(b[ta])
                 b = b[b[sf].notna()]
-                st.plotly_chart(plots.bars(b, bom.columns[0], [sf], title="Stock físico al inicio por ítem (unidades del ítem)"),
+                theme.chart(plots.bars(b, bom.columns[0], [sf], title="Stock físico al inicio por ítem (unidades del ítem)"),
                                 use_container_width=True)
                 st.caption("Tiempo de atención (TA) por ítem: " + ", ".join(
                     f"{r[bom.columns[0]]}: {r[ta]:g} sem" for _, r in b.iterrows() if pd.notna(r[ta])))
@@ -195,7 +195,7 @@ def render_obj4(wb, schema):
             r = _row_series(firme, "Pedidos en firme")
             if r:
                 df = pd.DataFrame({"Semana": list(r.keys()), "Pedidos en firme": list(r.values())})
-                st.plotly_chart(plots.bars(df, "Semana", ["Pedidos en firme"], title="Pedidos en firme por semana (unidades)"),
+                theme.chart(plots.bars(df, "Semana", ["Pedidos en firme"], title="Pedidos en firme por semana (unidades)"),
                                 use_container_width=True)
 
     # 3. Pronóstico
@@ -207,11 +207,11 @@ def render_obj4(wb, schema):
                 h[c] = _num(h[c])
             dem, fc = _c(h, "Demanda real"), _c(h, "Pronóstico")
             if dem and fc:
-                st.plotly_chart(plots.lines(h, h.columns[0], [dem, fc], title="Demanda real vs pronóstico (unidades)"),
+                theme.chart(plots.lines(h, h.columns[0], [dem, fc], title="Demanda real vs pronóstico (unidades)"),
                                 use_container_width=True)
             err = _c(h, "Error")
             if err:
-                st.plotly_chart(plots.bars(h, h.columns[0], [err], title="Error por periodo (unidades)"),
+                theme.chart(plots.bars(h, h.columns[0], [err], title="Error por periodo (unidades)"),
                                 use_container_width=True)
             theme.show_table(h, "obj4_historia", title="Historia de demanda, pronóstico y error")
             theme.notice("Columnas tomadas del libro (suavizado exponencial). El error sigue la fórmula de la hoja.", "info")
@@ -244,11 +244,11 @@ def render_obj4(wb, schema):
             if bars_cols:
                 for c in bars_cols:
                     wk[c] = _num(wk[c])
-                st.plotly_chart(plots.bars(wk, "Semana", bars_cols, title=f"Necesidades y llegadas · {sel}"),
+                theme.chart(plots.bars(wk, "Semana", bars_cols, title=f"Necesidades y llegadas · {sel}"),
                                 use_container_width=True)
             if inv:
                 wk[inv] = _num(wk[inv])
-                st.plotly_chart(plots.lines(wk, "Semana", [inv], title=f"Inventario final proyectado · {sel}"),
+                theme.chart(plots.lines(wk, "Semana", [inv], title=f"Inventario final proyectado · {sel}"),
                                 use_container_width=True)
         pmp = T.get("pmp", {}).get("df")
         if pmp is not None:
@@ -258,7 +258,7 @@ def render_obj4(wb, schema):
             if dem and pl:
                 df = pd.DataFrame({"Semana": list(dem.keys()), "Demanda usada": list(dem.values()),
                                    "PMP": [pl.get(k) for k in dem]})
-                st.plotly_chart(plots.lines(df, "Semana", ["Demanda usada", "PMP"],
+                theme.chart(plots.lines(df, "Semana", ["Demanda usada", "PMP"],
                                             title="Demanda usada vs PMP (unidades de producto)"),
                                 use_container_width=True)
 
@@ -274,7 +274,7 @@ def render_obj4(wb, schema):
             ord_rows = oc[oc[ok_col].isin(["Sí", "No"])] if ok_col else oc.iloc[0:0]
             if len(ord_rows) and ret:
                 fig_df = ord_rows[[ord_rows.columns[0], ret]].copy()
-                st.plotly_chart(plots.bars(fig_df, fig_df.columns[0], [ret],
+                theme.chart(plots.bars(fig_df, fig_df.columns[0], [ret],
                                            title="Retraso por orden de compra (semanas, AS-IS)"),
                                 use_container_width=True)
                 emitidas, a_tiempo = len(ord_rows), int((ord_rows[ok_col] == "Sí").sum())
@@ -293,7 +293,7 @@ def render_obj4(wb, schema):
                 num = od.copy()
                 for c in cols:
                     num[c] = _num(num[c])
-                st.plotly_chart(plots.bars(num, num.columns[0], cols,
+                theme.chart(plots.bars(num, num.columns[0], cols,
                                            title="Órdenes recibidas a tiempo por insumo: AS-IS vs TO-BE"),
                                 use_container_width=True)
             theme.show_table(od, "obj4_oc_detalle", title="Detalle de órdenes a tiempo por insumo")
@@ -309,7 +309,7 @@ def render_obj4(wb, schema):
             gg = g.copy()
             for c in gg.columns[1:]:
                 gg[c] = _num(gg[c])
-            st.plotly_chart(plots.bars(gg, gg.columns[0], list(gg.columns[1:]),
+            theme.chart(plots.bars(gg, gg.columns[0], list(gg.columns[1:]),
                                        title="AS-IS vs TO-BE vs estándar"),
                             use_container_width=True)
             theme.show_table(g, "obj4_grafico", title="Datos del gráfico AS-IS vs TO-BE vs estándar")
@@ -359,7 +359,7 @@ def render_obj5(wb, schema):
             if vcol and icol:
                 fig = plots.bars(v, v.columns[0], [vcol], title="Ventas e inventario promedio (S/)")
                 fig.add_scatter(name=icol, x=v[v.columns[0]], y=v[icol], mode="lines+markers")
-                st.plotly_chart(fig, use_container_width=True)
+                theme.chart(fig, use_container_width=True)
             theme.show_table(ven, "obj5_ventas", title="Ventas, inventario y rotación (periodo mensual)")
         else:
             _missing("Ventas e inventario")
@@ -378,11 +378,11 @@ def render_obj5(wb, schema):
             for c in p.columns[1:]:
                 p[c] = _num(p[c])
             if real and fc:
-                st.plotly_chart(plots.lines(p, p.columns[0], [real, fc], title="Venta real vs pronóstico (S/)"),
+                theme.chart(plots.lines(p, p.columns[0], [real, fc], title="Venta real vs pronóstico (S/)"),
                                 use_container_width=True)
             e = _c(p, "Error (%)")
             if e:
-                st.plotly_chart(plots.bars(p, p.columns[0], [e], title="Error % por mes", yfmt=".0%"),
+                theme.chart(plots.bars(p, p.columns[0], [e], title="Error % por mes", yfmt=".0%"),
                                 use_container_width=True)
             theme.show_table(pr, "obj5_pronostico", title="Ventas históricas, pronóstico y error")
             theme.notice("Columnas tomadas del libro. Pronóstico: promedio móvil de 3 meses (según la hoja).", "info")
@@ -397,7 +397,7 @@ def render_obj5(wb, schema):
             for c in m.columns[1:]:
                 m[c] = _num(m[c])
             if bruta and neta:
-                st.plotly_chart(plots.bars(m, m.columns[0], [bruta, neta], title="Necesidad bruta vs neta (S/)"),
+                theme.chart(plots.bars(m, m.columns[0], [bruta, neta], title="Necesidad bruta vs neta (S/)"),
                                 use_container_width=True)
             theme.show_table(mrp, "obj5_mrp", title="Política lote por lote: necesidades, stock y órdenes")
         else:
@@ -411,12 +411,12 @@ def render_obj5(wb, schema):
                 i2[c] = _num(i2[c])
             asis, obj = _c(i2, "Inventario As-Is"), _c(i2, "Stock objetivo")
             if asis and obj:
-                st.plotly_chart(plots.lines(i2, i2.columns[0], [asis, obj],
+                theme.chart(plots.lines(i2, i2.columns[0], [asis, obj],
                                             title="Inventario AS-IS vs stock objetivo con lote por lote (S/)"),
                                 use_container_width=True)
             exc, red = _c(i2, "Exceso"), _c(i2, "Reducción")
             if exc and red:
-                st.plotly_chart(plots.bars(i2, i2.columns[0], [exc, red], title="Excedente y reducción lograda (S/)"),
+                theme.chart(plots.bars(i2, i2.columns[0], [exc, red], title="Excedente y reducción lograda (S/)"),
                                 use_container_width=True)
             theme.show_table(inv, "obj5_inventario", title="Evolución mensual: inventario, stock objetivo y excedente")
         else:
@@ -432,7 +432,7 @@ def render_obj5(wb, schema):
             if rc:
                 r = ven.copy()
                 r[rc] = _num(r[rc])
-                st.plotly_chart(plots.lines(r, r.columns[0], [rc], title="Rotación mensual (veces/mes)"),
+                theme.chart(plots.lines(r, r.columns[0], [rc], title="Rotación mensual (veces/mes)"),
                                 use_container_width=True)
         lit = T.get("literatura", {}).get("df")
         if lit is not None:
@@ -442,7 +442,7 @@ def render_obj5(wb, schema):
                 ll[c] = _num(ll[c])
             cols = [c for c in ll.columns[1:] if c in ("Antes", "Después")]
             if cols:
-                st.plotly_chart(plots.bars(ll, ll.columns[0], cols, title="Inventario promedio: antes vs después (EOQ = 100 %)",
+                theme.chart(plots.bars(ll, ll.columns[0], cols, title="Inventario promedio: antes vs después (EOQ = 100 %)",
                                            yfmt=".0%"), use_container_width=True)
 
     with tabs[5]:
@@ -453,7 +453,7 @@ def render_obj5(wb, schema):
             if mcol:
                 e[mcol] = _num(e[mcol])
                 d = e[e[mcol].notna()]
-                st.plotly_chart(plots.bars(d, d.columns[0], [mcol], title="Componentes económicos (S/)", horizontal=True),
+                theme.chart(plots.bars(d, d.columns[0], [mcol], title="Componentes económicos (S/)", horizontal=True),
                                 use_container_width=True)
             theme.show_table(eco, "obj5_economia", title="Mermas, ahorro, inversión, costos y beneficio neto")
             theme.notice("Mermas simuladas según el libro; la fórmula de cada concepto está en la columna «Cálculo / supuesto».", "warn")

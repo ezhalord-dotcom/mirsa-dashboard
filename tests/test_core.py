@@ -73,6 +73,34 @@ def test_estado_de_hojas_y_menu():
     assert any(r["Hoja"] == "Flujo Caja" for r in rows)
 
 
+def test_imagenes_catalogo_coincide_con_el_libro():
+    from core import imagenes
+    out = Path(tempfile.mkdtemp()) / "excel_images"
+    cat = imagenes.build(XLSX, out)
+    anclas = imagenes.scan(XLSX)
+    assert cat["total_anclas"] == len(anclas) == len(cat["imagenes"])
+    assert sum(v["anclas"] for v in cat["hojas"].values()) == cat["total_anclas"]
+    assert all((out / e["archivo"]).exists() for e in cat["imagenes"])
+    # cada hoja del catálogo sale en su carpeta
+    assert all(e["archivo"].startswith(imagenes._slug(e["hoja"]) + "/") for e in cat["imagenes"])
+
+
+def test_imagenes_no_duplican_ni_conservan_obsoletas():
+    from core import imagenes
+    out = Path(tempfile.mkdtemp()) / "excel_images"
+    imagenes.sync(XLSX, out)
+    n1 = sorted(p.name for p in out.rglob("*") if p.is_file())
+    mt = {p: p.stat().st_mtime_ns for p in out.rglob("*") if p.is_file()}
+    imagenes.sync(XLSX, out)                       # mismo libro: no reescribe nada
+    assert sorted(p.name for p in out.rglob("*") if p.is_file()) == n1
+    assert all(p.stat().st_mtime_ns == t for p, t in mt.items())
+    basura = out / "hoja_vieja" / "01_obsoleta.png"  # imagen de una versión anterior
+    basura.parent.mkdir(parents=True)
+    basura.write_bytes(b"x")
+    imagenes.build(XLSX, out)
+    assert not basura.exists() and not basura.parent.exists()
+
+
 if __name__ == "__main__":
     fns = [v for k, v in dict(globals()).items() if k.startswith("test_")]
     for fn in fns:

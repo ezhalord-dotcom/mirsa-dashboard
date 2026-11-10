@@ -74,7 +74,7 @@ def render(wb, schema):
             d = imp[imp[pcol].astype(str).str.upper().str.strip() != "TOTAL"].copy()
             d["Problema"] = d[pcol].astype(str).str.split("—").str[0].str.strip()
             d[vcol] = pd.to_numeric(d[vcol], errors="coerce")
-            st.plotly_chart(plots.bars(d, "Problema", [vcol], title="Impacto anual (S/)"), use_container_width=True)
+            theme.chart(plots.bars(d, "Problema", [vcol], title="Impacto anual (S/)"), use_container_width=True)
         else:
             theme.no_data("Tabla Resumen")
 

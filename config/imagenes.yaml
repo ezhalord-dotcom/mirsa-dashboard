@@ -1,0 +1,15 @@
+# Qué hojas de origen se muestran en cada sección del menú.
+# Las imágenes se toman de la hoja donde están en el Excel; no se cambia su significado.
+# Una hoja que no aparece aquí solo se ve en el Explorador. Nombres exactos o con espacios sobrantes.
+inicio:        ["Carátula", "Indice"]
+diagnostico:   ["Empresa", "EOp", "EPr", "Problematica", "Analisis Causa-Raiz", "Brecha Problema 2", "Brecha Problema 3", "Brecha Problema 4", "Base de datos"]
+ahp:           ["Matriz AHP"]
+obj2:          ["DesarrolloOBJ2"]
+obj3:          ["DesarrolloOBJ3"]
+obj4:          ["Desarrollo Obj. 4"]
+obj5:          ["Desarrollo Obj. 5"]
+minmax:        ["Min-Max"]
+resultados:    ["Resultados-Indicadores", "Planteamiento"]
+economia:      ["Tabla Resumen"]
+conclusiones:  []
+explorador:    "*"

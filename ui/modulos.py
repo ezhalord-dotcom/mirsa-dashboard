@@ -50,7 +50,7 @@ def render(wb, schema, module_id: str):
                 with cols[i % 2]:
                     try:
                         cv = chart_values(wb, ch)
-                        st.plotly_chart(plots.from_chart_values(cv), use_container_width=True)
+                        theme.chart(plots.from_chart_values(cv), use_container_width=True)
                     except Exception as e:  # un gráfico roto no debe tumbar la página
                         theme.notice(f"No se pudo dibujar el gráfico «{ch.get('title') or i + 1}»: {e}", "warn")
     with st.expander("Hoja original completa (tablas y cálculos)"):

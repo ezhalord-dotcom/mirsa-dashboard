@@ -2,6 +2,8 @@
 import pandas as pd
 import streamlit as st
 
+from ui import theme
+
 from core.modules import extract_module
 from ui import plots
 
@@ -81,7 +83,7 @@ def render_obj3(wb, schema):
             ref_col = _col(m, "Referencia")
             fig = plots.bars(m, "Mes", ["IRA"], title="IRA mensual AS IS (registros correctos / verificados)",
                              ref=float(m[ref_col].iloc[0]) if ref_col else None, yfmt=".0%")
-            st.plotly_chart(fig, use_container_width=True)
+            theme.chart(fig, use_container_width=True)
             st.dataframe(m, use_container_width=True, hide_index=True)
         c = data["tables"].get("ciclos", {}).get("df")
         if c is not None and len(c):
@@ -89,7 +91,7 @@ def render_obj3(wb, schema):
             c["IRA"] = pd.to_numeric(c["IRA"], errors="coerce")
             fig = plots.bars(c, "Ciclo", ["IRA"], title="IRA por ciclo del piloto (TO BE)",
                              ref=float(ira_ref) if isinstance(ira_ref, (int, float)) else None, yfmt=".0%")
-            st.plotly_chart(fig, use_container_width=True)
+            theme.chart(fig, use_container_width=True)
             st.dataframe(c, use_container_width=True, hide_index=True)
             n_col = _col(c, "SKU contados")
             if n_col is not None:
@@ -104,7 +106,7 @@ def render_obj3(wb, schema):
             cum = _col(p, "acumulado")
             if cnt is not None and cum is not None:
                 total = int(pd.to_numeric(p[cnt], errors="coerce").sum())
-                st.plotly_chart(plots.pareto(p, cat, cnt, cum,
+                theme.chart(plots.pareto(p, cat, cnt, cum,
                                              title=f"Pareto de causas de diferencias ({total} registros)"),
                                 use_container_width=True)
             st.dataframe(p, use_container_width=True, hide_index=True)
@@ -149,14 +151,14 @@ def render_obj2(wb, schema):
         f = data["tables"].get("ciclo_fases", {}).get("df")
         if f is not None and len(f):
             fases = f[f["Fase"].astype(str).str.lower() != "ciclo total"]
-            st.plotly_chart(plots.bars(fases, "Fase", ["Antes (min)", "Después (min)"],
+            theme.chart(plots.bars(fases, "Fase", ["Antes (min)", "Después (min)"],
                                        title="Tiempo de ciclo por fase (min)"), use_container_width=True)
             st.dataframe(f, use_container_width=True, hide_index=True)
     with tab2:
         e = data["tables"].get("tiempo_estandar", {}).get("df")
         if e is not None and len(e):
             fases = e[e.iloc[:, 0].astype(str).str.lower() != "ciclo total"]
-            st.plotly_chart(plots.bars(fases, fases.columns[0], list(fases.columns[1:3]),
+            theme.chart(plots.bars(fases, fases.columns[0], list(fases.columns[1:3]),
                                        title="Tiempo estándar por fase (min)"), use_container_width=True)
             st.dataframe(e, use_container_width=True, hide_index=True)
     with tab3:

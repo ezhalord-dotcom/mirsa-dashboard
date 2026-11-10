@@ -74,3 +74,11 @@ Las pruebas comprueban los KPIs de Objetivo 3 (514/712 AS IS, 13/14 TO BE, B/C 2
 2. Incluye el Excel en `data/source/AvanceT3G55X.xlsx` (o súbelo desde la barra lateral; en la nube
    el disco se borra al reiniciar, así que para una versión fija conviene incluirlo en el repositorio).
 3. En "New app" elige el repositorio y `app.py` como archivo principal.
+
+## Imágenes del libro
+- `core/imagenes.py` recorre todas las hojas del Excel y copia cada imagen tal cual en `assets/excel_images/<hoja>/`.
+- El catálogo está en `assets/excel_images/catalogo_imagenes.json` y `.csv`: id, hoja, número dentro de la hoja, fila, columna, celda, archivo, formato y MD5.
+- Cada ancla de imagen tiene su entrada. Si la misma imagen aparece dos veces en una hoja, se guarda una sola vez y la entrada queda marcada como `repetida_en_hoja`.
+- Al cambiar el Excel (Sincronización), el catálogo se reconstruye, se escriben solo archivos nuevos y se borran las imágenes de versiones anteriores.
+- `config/imagenes.yaml` indica qué hojas se muestran en cada sección. Las hojas no asignadas se ven en el Explorador.
+- Formatos: PNG y JPEG se muestran en pantalla. EMF no se puede mostrar en navegadores; se ofrece su descarga.

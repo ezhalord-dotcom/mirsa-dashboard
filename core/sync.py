@@ -19,7 +19,13 @@ class SyncResult:
         self.md5 = md5
 
 
-def load_source(path: str | Path, data_dir: str | Path, force: bool = False) -> SyncResult:
+def _sync_images(path, assets_dir):
+    """Extrae las imágenes del libro y reemplaza las de versiones anteriores (ver core/imagenes.py)."""
+    from core import imagenes
+    imagenes.sync(path, assets_dir or imagenes.ASSETS)
+
+
+def load_source(path: str | Path, data_dir: str | Path, force: bool = False, assets_dir=None) -> SyncResult:
     data_dir = Path(data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
     state_file = data_dir / "state.json"
@@ -28,11 +34,13 @@ def load_source(path: str | Path, data_dir: str | Path, force: bool = False) -> 
     state = json.loads(state_file.read_text(encoding="utf-8")) if state_file.exists() else {}
 
     if not force and state.get("md5") == md5 and state.get("changes") is not None:
-        wb = read_workbook(path, images_dir=data_dir / "images")  # rápido: solo celdas y XML
+        wb = read_workbook(path)  # rápido: solo celdas y XML
+        _sync_images(path, assets_dir)
         return SyncResult(wb, state.get("changes", []), False, md5)
 
     prev = json.loads(last_file.read_text(encoding="utf-8")) if last_file.exists() else None
-    wb = read_workbook(path, images_dir=data_dir / "images")
+    wb = read_workbook(path)
+    _sync_images(path, assets_dir)
     cur = compact_snapshot(wb)
     changes = diff_snapshots(prev, cur)
     last_file.write_text(json.dumps(cur, ensure_ascii=False), encoding="utf-8")

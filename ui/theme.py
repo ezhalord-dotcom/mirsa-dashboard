@@ -42,7 +42,23 @@ def inject():
     st.markdown(CSS, unsafe_allow_html=True)
 
 
+# Claves únicas por ejecución: Streamlit exige un key distinto para cada gráfico o botón repetido.
+_KEYS = {"n": 0}
+
+
+def _uid(prefix: str) -> str:
+    _KEYS["n"] += 1
+    return f"{prefix}_{_KEYS['n']}"
+
+
+def chart(fig, **kw):
+    """Gráfico Plotly con clave única (evita StreamlitDuplicateElementId)."""
+    kw.setdefault("use_container_width", True)
+    st.plotly_chart(fig, key=_uid("plt"), **kw)
+
+
 def topbar(search_placeholder="Buscar en el proyecto…"):
+    _KEYS["n"] = 0  # cada ejecución de la página empieza el conteo de claves
     st.markdown('<div class="topbar"><div class="brand">EXPORTACIONES MIRSA <span>· Dashboard de tesis</span></div>'
                 '<div class="sub" style="color:#5B6B7F;font-size:13px">Fuente única: el libro de Excel</div></div>',
                 unsafe_allow_html=True)
@@ -83,4 +99,4 @@ def show_table(df, key: str, title: str | None = None):
         st.markdown(f"**{_html.escape(title)}**")
     st.dataframe(df, use_container_width=True, hide_index=True)
     st.download_button("⬇️ Descargar tabla (CSV)", df.to_csv(index=False).encode("utf-8-sig"),
-                       file_name=f"{key}.csv", mime="text/csv", key=f"dl_{key}")
+                       file_name=f"{key}.csv", mime="text/csv", key=_uid(f"dl_{key}"))

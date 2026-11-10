@@ -10,7 +10,7 @@ import yaml
 
 from core.modules import load_schema
 from core.sync import load_source, sheet_status
-from ui import (theme, home, diagnostico, modulos, resultados, economia,
+from ui import (recursos, theme, home, diagnostico, modulos, resultados, economia,
                 conclusiones, explorador, sync_page, dashboards)
 
 ROOT = Path(__file__).parent
@@ -107,3 +107,7 @@ elif view == "sync":
                                      "Base de datos", "Planteamiento ", "Resultados-Indicadores",
                                      "Conclusiones", "Recomendaciones", "Flujo Caja", "EOp", "EPr ", "Indice", "Carátula"]]
     sync_page.render(wb.read_at, wb.md5, str(src), sync.changes, sheet_status(wb, known))
+
+# ------------------------------------------------------------ imágenes del libro por sección
+if view != "sync":
+    recursos.panel(section["id"])
