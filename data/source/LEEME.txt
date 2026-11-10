@@ -1,0 +1,2 @@
+Copia aquí el libro de Excel (AvanceT3G55X.xlsx) o súbelo desde la barra lateral de la app.
+La app usa el .xlsx más reciente de esta carpeta, o la variable de entorno MIRSA_XLSX.

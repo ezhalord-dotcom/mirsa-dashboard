@@ -1,0 +1,58 @@
+# Esquema: qué buscar en el Excel. Edita las ETIQUETAS (no las direcciones de celda).
+# block.header  : texto del encabezado de la tabla (se busca en el libro)
+# block.occurrence : cuál aparición usar si el texto se repite (1 = primera)
+# block.max_rows : máximo de filas a leer (la lectura se corta en la primera fila vacía)
+# kpi.label     : texto de la etiqueta; el valor es la primera celda con valor a su derecha
+# Si una etiqueta no se encuentra, la app lo muestra en "Estado de sincronización".
+
+modules:
+  obj2:
+    sheet: DesarrolloOBJ2
+    title: "Objetivo 2 · Slotting (tiempo de picking)"
+    blocks:
+      ciclo_fases:    {header: "Antes (min)", occurrence: 1, max_rows: 5}
+      tiempo_estandar: {header: "Antes (min)", occurrence: 2, max_rows: 5}
+      semaforo:       {header: "Antes (AS-IS)", max_rows: 6}
+      productividad:  {header: "Productividad (pedidos por hora y operario)", max_rows: 1}
+    kpis:
+      - {label: "Reducción Del tiempo de ciclo", name: "Reducción del tiempo de ciclo"}
+      - {label: "Brecha cerrada del ciclo", name: "Brecha cerrada del ciclo"}
+    umbrales:
+      verde: "Umbral VERDE"
+      amarillo: "Umbral AMARILLO"
+
+  obj3:
+    sheet: DesarrolloOBJ3
+    title: "Objetivo 3 · Conteo cíclico (exactitud de inventario)"
+    blocks:
+      ira_mensual:    {header: "Registros verificados", occurrence: 2, max_rows: 12}
+      ira_base:       {header: "AS IS (antes)", occurrence: 1, max_rows: 2}
+      pareto:         {header: "Causa de la diferencia", max_rows: 7}
+      ciclos:         {header: "Periodo", max_rows: 3}
+      semaforo:       {header: "Semáforo AS IS", max_rows: 6}
+      ahp_pesos:      {header: "Peso del criterio", max_rows: 3}
+    kpis:
+      - {label: "ALCANCE DE LA HERRAMIENTA", name: "Alcance de la herramienta (% de diferencias)"}
+      - {label: "Ahorro estimado anual", name: "Ahorro estimado anual (S/)"}
+      - {label: "Inversión inicial", name: "Inversión inicial (S/)"}
+      - {label: "Costo operativo anual", name: "Costo operativo anual (S/)"}
+      - {label: "Relación beneficio / costo del año 1", name: "Relación beneficio / costo"}
+      - {label: "Recuperación de la inversión", name: "Recuperación de la inversión (meses)"}
+
+  obj4:
+    sheet: "Desarrollo Obj. 4"
+    title: "Objetivo 4 · MRP (pedidos entregados a tiempo)"
+    blocks: {}
+    kpis: []
+
+  obj5:
+    sheet: "Desarrollo Obj. 5"
+    title: "Objetivo 5 · Lote por lote (vejez del inventario)"
+    blocks: {}
+    kpis: []
+
+  minmax:
+    sheet: "Min-Max"
+    title: "Min-Max · Exceso de duración del inventario"
+    blocks: {}
+    kpis: []
