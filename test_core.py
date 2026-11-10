@@ -1,0 +1,80 @@
+"""
+Pruebas del núcleo (sin Streamlit ni Plotly). Ejecutar:
+    MIRSA_XLSX=/ruta/al/libro.xlsx python -m pytest -q tests      (o: python tests/test_core.py)
+"""
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from core.modules import extract_module, load_schema  # noqa: E402
+from core.sync import load_source, sheet_status  # noqa: E402
+from core.xlsx_reader import read_workbook  # noqa: E402
+
+XLSX = os.environ.get("MIRSA_XLSX", "")
+SCHEMA = load_schema(ROOT / "config" / "schema.yaml")
+
+
+def _wb():
+    assert XLSX and Path(XLSX).exists(), "Define MIRSA_XLSX con la ruta del libro"
+    return read_workbook(XLSX)
+
+
+def test_obj3_bloques_y_kpis():
+    d = extract_module(_wb(), "obj3", SCHEMA)
+    assert d["warnings"] == [], d["warnings"]
+    assert len(d["tables"]["ira_mensual"]["df"]) == 12
+    assert len(d["tables"]["semaforo"]["df"]) == 6
+    assert len(d["tables"]["ciclos"]["df"]) == 3
+    k = {x["name"]: x["value"] for x in d["kpis"]}
+    assert abs(k["Relación beneficio / costo"] - 2.31) < 0.01
+    assert abs(k["Ahorro estimado anual (S/)"] - 32861.9) < 1
+
+
+def test_obj3_ira_coincide_con_kardex():
+    d = extract_module(_wb(), "obj3", SCHEMA)
+    base = d["tables"]["ira_base"]["df"]
+    assert abs(base.iloc[0, 1] - 514 / 712) < 0.001       # AS IS = 514 de 712
+    assert abs(base.iloc[0, 2] - 13 / 14) < 0.001          # TO BE = 13 de 14
+
+
+def test_obj2_bloques():
+    d = extract_module(_wb(), "obj2", SCHEMA)
+    assert d["warnings"] == [], d["warnings"]
+    assert len(d["tables"]["semaforo"]["df"]) == 6
+    assert len(d["tables"]["ciclo_fases"]["df"]) == 5
+
+
+def test_hoja_inexistente_no_falla():
+    wb = _wb()
+    fake = {"modules": {"x": {"sheet": "NO EXISTE", "title": "x", "blocks": {}, "kpis": []}}}
+    d = extract_module(wb, "x", fake)
+    assert d["warnings"] and not d["sheet_found"]
+
+
+def test_sincronizacion_detecta_cambios():
+    d = tempfile.mkdtemp()
+    r1 = load_source(XLSX, d)
+    assert r1.reloaded
+    r2 = load_source(XLSX, d)
+    assert not r2.reloaded          # mismo archivo: no vuelve a leer
+    assert r2.changes
+
+
+def test_estado_de_hojas_y_menu():
+    import yaml
+    menu = [i for g in yaml.safe_load(open(ROOT / "config" / "menu.yaml", encoding="utf-8"))["groups"]
+            for i in g["items"]]
+    rows = sheet_status(_wb(), menu)
+    assert any(r["Hoja"].startswith("DesarrolloOBJ3") for r in rows)
+
+
+if __name__ == "__main__":
+    fns = [v for k, v in dict(globals()).items() if k.startswith("test_")]
+    for fn in fns:
+        fn()
+        print("OK", fn.__name__)
+    print(f"{len(fns)} pruebas correctas")

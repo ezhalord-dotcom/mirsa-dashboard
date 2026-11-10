@@ -1,0 +1,29 @@
+# Menú de la app. "sheet" se compara normalizado (sin espacios al final ni tildes).
+# Las hojas que no estén aquí aparecen al final, en "Otras hojas", sin error.
+# "view": dashboard (vista del objetivo) o generic (renderizado genérico de la hoja).
+groups:
+  - name: Presentación y empresa
+    items:
+      - {sheet: "Carátula", view: generic}
+      - {sheet: "Indice", view: generic}
+      - {sheet: "Empresa", view: generic}
+      - {sheet: "EOp", view: generic}
+      - {sheet: "EPr ", view: generic}
+  - name: Diagnóstico
+    items:
+      - {sheet: "Problematica", view: generic}
+      - {sheet: "Brecha Problema 2", view: generic}
+      - {sheet: "Brecha Problema 3", view: generic}
+      - {sheet: "Brecha Problema 4", view: generic}
+      - {sheet: "Tabla Resumen", view: generic}
+      - {sheet: "Analisis Causa-Raiz ", view: generic}
+      - {sheet: "Matriz AHP ", view: generic}
+  - name: Propuesta
+    items:
+      - {sheet: "Planteamiento ", view: generic}
+      - {sheet: "DesarrolloOBJ2", view: dashboard, module: obj2}
+      - {sheet: "DesarrolloOBJ3", view: dashboard, module: obj3}
+      - {sheet: "Desarrollo Obj. 4", view: dashboard, module: obj4}
+      - {sheet: "Desarrollo Obj. 5", view: dashboard, module: obj5}
+      - {sheet: "Min-Max", view: dashboard, module: minmax}
+      - {sheet: "Resultados-Indicadores", view: generic}
