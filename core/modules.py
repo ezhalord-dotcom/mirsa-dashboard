@@ -38,7 +38,10 @@ def extract_module(wb: Workbook, module_id: str, schema: dict) -> dict:
         out["tables"][key] = {"df": df, "range": rng}
 
     for kpi in spec.get("kpis") or []:
-        val = wb.value_right_of(sheet, kpi["label"])
+        if kpi.get("mode") == "below":
+            val = wb.value_below(sheet, kpi["label"])
+        else:
+            val = wb.value_right_of(sheet, kpi["label"])
         if val is None:
             out["warnings"].append(f"KPI «{kpi['label']}»: no se encontró valor a la derecha.")
         out["kpis"].append({"name": kpi.get("name", kpi["label"]), "value": val})

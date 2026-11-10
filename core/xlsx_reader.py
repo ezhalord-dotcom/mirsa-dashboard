@@ -107,6 +107,36 @@ class Workbook:
         return [(r, c) for r in sorted(sheet.grid) for c in sorted(sheet.grid[r])
                 if isinstance(sheet.grid[r][c], str) and target and target in norm(sheet.grid[r][c])]
 
+    def value_below(self, sheet: SheetData, label: str, occurrence: int = 1):
+        """Primer valor debajo de la etiqueta (misma columna)."""
+        hits = self.find_all(sheet, label)
+        for r, c in hits[occurrence - 1:] if occurrence > 1 else hits:
+            v = sheet.grid.get(r + 1, {}).get(c)
+            if v is not None:
+                return v
+        return None
+
+    def value_near(self, sheet: SheetData, label: str, occurrence: int = 1):
+        """Valor a la derecha; si no hay, debajo. Útil para textos de cabecera."""
+        v = self.value_right_of(sheet, label, occurrence)
+        return v if v is not None else self.value_below(sheet, label, occurrence)
+
+    def search(self, query: str, limit: int = 60) -> list:
+        """Busca un texto en todas las hojas. Devuelve (hoja, celda, texto)."""
+        q = norm(query)
+        out = []
+        if not q:
+            return out
+        for sd in self.sheets.values():
+            for r in sorted(sd.grid):
+                for c in sorted(sd.grid[r]):
+                    v = sd.grid[r][c]
+                    if isinstance(v, str) and q in norm(v):
+                        out.append((sd.name.strip(), cell_ref(r, c), v[:160]))
+                        if len(out) >= limit:
+                            return out
+        return out
+
     def read_table(self, sheet: SheetData, header_text: str, occurrence: int = 1,
                    max_rows: int = 300) -> tuple[pd.DataFrame, str] | None:
         """

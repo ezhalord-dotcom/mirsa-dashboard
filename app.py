@@ -1,9 +1,6 @@
 """
 Mirsa · Dashboard de tesis (Streamlit).
-El Excel es la única fuente de verdad: la app lee el libro en cada cambio (MD5),
-no tiene números escritos a mano y los bloques se buscan por etiqueta.
-
-Ejecutar:  streamlit run app.py
+El Excel es la única fuente de verdad. Ejecutar:  streamlit run app.py
 """
 import os
 from pathlib import Path
@@ -13,16 +10,17 @@ import yaml
 
 from core.modules import load_schema
 from core.sync import load_source, sheet_status
-from core.textnorm import norm
-from ui import dashboards, generic, sync_page
+from ui import (theme, home, diagnostico, modulos, resultados, economia,
+                conclusiones, explorador, sync_page, dashboards)
 
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 SOURCE_DIR = DATA / "source"
 SCHEMA = load_schema(ROOT / "config" / "schema.yaml")
-MENU = yaml.safe_load(open(ROOT / "config" / "menu.yaml", encoding="utf-8"))
+NAV = yaml.safe_load(open(ROOT / "config" / "menu.yaml", encoding="utf-8"))["sections"]
 
-st.set_page_config(page_title="Mirsa · Tesis", layout="wide", page_icon="📦")
+st.set_page_config(page_title="Mirsa · Dashboard de tesis", layout="wide", page_icon="📦")
+theme.inject()
 
 
 def default_source() -> Path | None:
@@ -39,19 +37,16 @@ def get_source(path: str, token: int, force: bool):
     return load_source(path, DATA, force=force)
 
 
-# ----------------------------------------------------------------- barra lateral
+# ------------------------------------------------------------ barra lateral
 with st.sidebar:
-    st.title("Mirsa · Tesis")
-    st.caption("Fuente: el Excel. Cambia el libro y recarga; no hay que tocar el código.")
-
+    st.markdown("### 📦 Mirsa")
+    st.caption("Dashboard de tesis · fuente: Excel")
     up = st.file_uploader("Subir nueva versión del .xlsx", type=["xlsx"])
     if up is not None:
         SOURCE_DIR.mkdir(parents=True, exist_ok=True)
-        dest = SOURCE_DIR / "AvanceT3G55X.xlsx"
-        dest.write_bytes(up.getbuffer())
+        (SOURCE_DIR / "AvanceT3G55X.xlsx").write_bytes(up.getbuffer())
         st.session_state["token"] = st.session_state.get("token", 0) + 1
         st.success("Versión nueva guardada.")
-
     if st.button("🔄 Recargar desde el Excel", use_container_width=True):
         st.session_state["token"] = st.session_state.get("token", 0) + 1
         st.session_state["force"] = True
@@ -66,35 +61,49 @@ force = st.session_state.pop("force", False)
 sync = get_source(str(src), token, force)
 wb = sync.wb
 
-if sync.reloaded:
-    st.sidebar.info("Excel leído de nuevo. Cambios detectados: " + str(len(sync.changes)))
+with st.sidebar:
+    labels = [f"{s['icon']}  {s['label']}" for s in NAV]
+    choice = st.radio("Navegación", labels, label_visibility="collapsed")
+    section = NAV[labels.index(choice)]
+    st.caption(f"Última lectura: {wb.read_at}")
 
-# ----------------------------------------------------------------- menú
-menu_items = [dict(it, group=g["name"]) for g in MENU["groups"] for it in g["items"]]
-pages = []
-for g in MENU["groups"]:
-    for it in g["items"]:
-        if wb.sheet(it["sheet"]) is not None:
-            title = it.get("title") or it["sheet"].strip()
-            pages.append((f"{g['name']} › {title}", it))
-menu_keys = {norm(i["sheet"]) for i in menu_items}
-for s in wb.sheets:
-    if norm(s) not in menu_keys:
-        pages.append((f"Otras hojas › {s.strip()}", {"sheet": s, "view": "generic"}))
-pages.append(("Sistema › Estado de sincronización", {"view": "sync"}))
+# ------------------------------------------------------------ barra superior y búsqueda
+theme.topbar()
+query = st.text_input("Buscar en todo el proyecto", placeholder="Ej.: rotación, ABC, IRA, ROP…",
+                      label_visibility="collapsed", key="q")
+if query.strip():
+    explorador.search_results(wb, query.strip())
+    st.stop()
 
-labels = [p[0] for p in pages]
-choice = st.sidebar.radio("Sección", labels, index=0)
-item = dict(pages[labels.index(choice)][1])
-
-# ----------------------------------------------------------------- contenido
-if item.get("view") == "sync":
-    sync_page.render(wb.read_at, wb.md5, str(src), sync.changes, sheet_status(wb, menu_items))
-elif item.get("view") == "dashboard" and item.get("module") in dashboards.MODULE_RENDERERS:
-    dashboards.MODULE_RENDERERS[item["module"]](wb, SCHEMA)
-else:
-    sheet = wb.sheet(item["sheet"])
-    if sheet is None:
-        st.error(f"La hoja «{item['sheet']}» no existe en el libro.")
+# ------------------------------------------------------------ enrutado
+view = section["view"]
+if view == "home":
+    home.render(wb, SCHEMA)
+elif view == "diagnostico":
+    diagnostico.render(wb)
+elif view == "ahp":
+    s = wb.sheet(section["sheet"])
+    theme.page_header("Selección de problemas (AHP)", "Criterios, comparaciones por pares y ponderaciones del libro.")
+    if s is None:
+        theme.no_data("Hoja Matriz AHP")
     else:
-        generic.render_sheet(wb, sheet)
+        from ui import generic
+        generic.render_sheet(wb, s)
+elif view == "module":
+    modulos.render(wb, SCHEMA, section["module"])
+elif view == "resultados":
+    resultados.render(wb, SCHEMA)
+elif view == "economia":
+    economia.render(wb, SCHEMA)
+elif view == "conclusiones":
+    conclusiones.render(wb)
+elif view == "explorador":
+    explorador.render(wb)
+elif view == "sync":
+    known = [{"sheet": s["sheet"]} for s in NAV if "sheet" in s]
+    known += [{"sheet": m["sheet"]} for m in SCHEMA["modules"].values()]
+    known += [{"sheet": n} for n in ["Empresa", "Problematica", "Brecha Problema 2", "Brecha Problema 3",
+                                     "Brecha Problema 4", "Analisis Causa-Raiz", "Tabla Resumen",
+                                     "Base de datos", "Planteamiento ", "Resultados-Indicadores",
+                                     "Conclusiones", "Recomendaciones", "Flujo Caja", "EOp", "EPr ", "Indice", "Carátula"]]
+    sync_page.render(wb.read_at, wb.md5, str(src), sync.changes, sheet_status(wb, known))

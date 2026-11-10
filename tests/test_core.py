@@ -66,10 +66,11 @@ def test_sincronizacion_detecta_cambios():
 
 def test_estado_de_hojas_y_menu():
     import yaml
-    menu = [i for g in yaml.safe_load(open(ROOT / "config" / "menu.yaml", encoding="utf-8"))["groups"]
-            for i in g["items"]]
+    menu = [s for s in yaml.safe_load(open(ROOT / "config" / "menu.yaml", encoding="utf-8"))["sections"]
+            if "sheet" in s]
     rows = sheet_status(_wb(), menu)
     assert any(r["Hoja"].startswith("DesarrolloOBJ3") for r in rows)
+    assert any(r["Hoja"] == "Flujo Caja" for r in rows)
 
 
 if __name__ == "__main__":

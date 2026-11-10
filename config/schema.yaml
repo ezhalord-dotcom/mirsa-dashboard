@@ -41,18 +41,61 @@ modules:
 
   obj4:
     sheet: "Desarrollo Obj. 4"
-    title: "Objetivo 4 · MRP (pedidos entregados a tiempo)"
-    blocks: {}
-    kpis: []
+    title: "Objetivo 4 · MRP y abastecimiento"
+    mrp_markers:
+      - ["MRP_ASIS", "AS-IS"]
+      - ["MRP_TOBE", "TO-BE"]
+      - ["TO-BE ejecución", "TO-BE (ejecución con retrasos)"]
+    blocks:
+      ahp_alt:        {header: "Alternativa", max_rows: 3}
+      ahp_pesos:      {header: "Peso del criterio", max_rows: 4}
+      bom:            {header: "CU (cantidad por unidad de producto)", max_rows: 6}
+      semanas_firme:  {header: "Semana", occurrence: 1, max_rows: 3}
+      historia:       {header: "Semana histórica", max_rows: 12}
+      pmp:            {header: "Semana", occurrence: 2, max_rows: 8}
+      oc:             {header: "Semana prometida (emisión + TA)", max_rows: 11}
+      lit:            {header: "Fuente / indicador de referencia", max_rows: 3}
+      resultados:     {header: "Estándar (verde)", max_rows: 6}
+      oc_insumo:      {header: "AS-IS: órdenes emitidas", max_rows: 7}
+      oc_detalle:     {header: "OC emitidas AS-IS", max_rows: 14}
+      roturas:        {header: "Semanas evaluadas", max_rows: 6}
+      aporte:         {header: "Aporte (pp)", max_rows: 3}
+      lit_comp:       {header: "Antes / AS-IS", max_rows: 3}
+      grafico:        {header: "Estándar", occurrence: 1, max_rows: 3}
+    kpis:
+      - {label: "MOTIVO 3", name: "Motivo"}
+      - {label: "CAUSA RAÍZ 3", name: "Causa raíz"}
+      - {label: "H1 (herramienta 1)", name: "Herramienta"}
+      - {label: "MAD (error absoluto medio)", name: "MAD (unidades)"}
+      - {label: "MAPE (error % medio)", name: "MAPE del pronóstico"}
+      - {label: "Total de órdenes emitidas", name: "Órdenes de compra emitidas"}
+      - {label: "Órdenes recibidas a tiempo", name: "Órdenes recibidas a tiempo"}
+      - {label: "Indicador AS-IS", name: "Indicador AS-IS (a tiempo)"}
 
   obj5:
     sheet: "Desarrollo Obj. 5"
     title: "Objetivo 5 · Lote por lote (vejez del inventario)"
-    blocks: {}
-    kpis: []
+    blocks:
+      datos_reales:   {header: "Mirsa (AS-IS)", max_rows: 2}
+      ahp_alt:        {header: "Alternativa", max_rows: 2}
+      ahp_pesos:      {header: "Peso del criterio", max_rows: 3}
+      ventas:         {header: "Ventas (S/)", max_rows: 16}
+      literatura:     {header: "Reducción relativa", max_rows: 3}
+      pronostico:     {header: "Venta real (S/)", max_rows: 15}
+      mrp:            {header: "Necesidad bruta (S/)", max_rows: 7}
+      inventario:     {header: "Inventario As-Is (S/)", max_rows: 13}
+      indicadores:    {header: "As-Is", occurrence: 1, max_rows: 6}
+      economia:       {header: "Monto (S/)", max_rows: 12}
+    kpis:
+      - {label: "Vejez de inventario", name: "Vejez de inventario (AS-IS → TO-BE)", mode: below}
+      - {label: "Rotación (veces/mes)", name: "Rotación (AS-IS → TO-BE)", mode: below}
+      - {label: "Impacto económico anual", name: "Impacto económico anual (AS-IS → TO-BE)", mode: below}
+      - {label: "Relación beneficio / costo", name: "Relación beneficio / costo", mode: below}
 
   minmax:
     sheet: "Min-Max"
     title: "Min-Max · Exceso de duración del inventario"
     blocks: {}
-    kpis: []
+    kpis:
+      - {label: "MOTIVO 4", name: "Motivo"}
+      - {label: "CAUSA RAÍZ 4", name: "Causa raíz"}

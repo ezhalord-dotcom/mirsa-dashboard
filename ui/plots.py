@@ -61,3 +61,18 @@ def from_chart_values(cv: dict):
     fig.update_layout(title=cv["title"] or "Gráfico del libro", template="plotly_white", height=380,
                       margin=dict(l=10, r=10, t=50, b=10))
     return fig
+
+
+def lines(df, x, ys: list, title="", ref: float | None = None, yfmt=None):
+    fig = go.Figure()
+    for i, y in enumerate(ys):
+        if y in df.columns:
+            fig.add_scatter(name=str(y), x=df[x], y=df[y], mode="lines+markers",
+                            line=dict(color=PALETTE[i % len(PALETTE)]))
+    if ref is not None:
+        fig.add_hline(y=ref, line_dash="dash", line_color=REF_COLOR, annotation_text="Referencia")
+    fig.update_layout(title=title, template="plotly_white", height=380,
+                      margin=dict(l=10, r=10, t=50, b=10), legend=dict(orientation="h", y=-0.2))
+    if yfmt:
+        fig.update_yaxes(tickformat=yfmt)
+    return fig

@@ -1,29 +1,16 @@
-# Menú de la app. "sheet" se compara normalizado (sin espacios al final ni tildes).
-# Las hojas que no estén aquí aparecen al final, en "Otras hojas", sin error.
-# "view": dashboard (vista del objetivo) o generic (renderizado genérico de la hoja).
-groups:
-  - name: Presentación y empresa
-    items:
-      - {sheet: "Carátula", view: generic}
-      - {sheet: "Indice", view: generic}
-      - {sheet: "Empresa", view: generic}
-      - {sheet: "EOp", view: generic}
-      - {sheet: "EPr ", view: generic}
-  - name: Diagnóstico
-    items:
-      - {sheet: "Problematica", view: generic}
-      - {sheet: "Brecha Problema 2", view: generic}
-      - {sheet: "Brecha Problema 3", view: generic}
-      - {sheet: "Brecha Problema 4", view: generic}
-      - {sheet: "Tabla Resumen", view: generic}
-      - {sheet: "Analisis Causa-Raiz ", view: generic}
-      - {sheet: "Matriz AHP ", view: generic}
-  - name: Propuesta
-    items:
-      - {sheet: "Planteamiento ", view: generic}
-      - {sheet: "DesarrolloOBJ2", view: dashboard, module: obj2}
-      - {sheet: "DesarrolloOBJ3", view: dashboard, module: obj3}
-      - {sheet: "Desarrollo Obj. 4", view: dashboard, module: obj4}
-      - {sheet: "Desarrollo Obj. 5", view: dashboard, module: obj5}
-      - {sheet: "Min-Max", view: dashboard, module: minmax}
-      - {sheet: "Resultados-Indicadores", view: generic}
+# Navegación del dashboard. Edita etiquetas, íconos y orden sin tocar código.
+# view: home | diagnostico | ahp | module | resultados | economia | conclusiones | explorador | sync
+sections:
+  - {id: inicio, label: "Inicio", icon: "🏠", view: home}
+  - {id: diagnostico, label: "Empresa y diagnóstico", icon: "🏢", view: diagnostico}
+  - {id: ahp, label: "Selección de problemas (AHP)", icon: "⚖️", view: ahp, sheet: "Matriz AHP "}
+  - {id: obj2, label: "Objetivo 2 · Slotting", icon: "📦", view: module, module: obj2}
+  - {id: obj3, label: "Objetivo 3 · Conteo cíclico", icon: "🔢", view: module, module: obj3}
+  - {id: obj4, label: "Objetivo 4 · MRP", icon: "🚚", view: module, module: obj4}
+  - {id: obj5, label: "Objetivo 5 · Lote por lote", icon: "🧊", view: module, module: obj5}
+  - {id: minmax, label: "Modelo Min-Max", icon: "📊", view: module, module: minmax}
+  - {id: resultados, label: "Resultados generales", icon: "📈", view: resultados}
+  - {id: economia, label: "Evaluación económica", icon: "💰", view: economia}
+  - {id: conclusiones, label: "Conclusiones y recomendaciones", icon: "📝", view: conclusiones}
+  - {id: explorador, label: "Explorador de hojas", icon: "🗂️", view: explorador}
+  - {id: sync, label: "Sincronización", icon: "🔄", view: sync}

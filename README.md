@@ -42,10 +42,35 @@ MIRSA_XLSX=/ruta/AvanceT3G55X.xlsx python tests/test_core.py
 ```
 Las pruebas comprueban los KPIs de Objetivo 3 (514/712 AS IS, 13/14 TO BE, B/C 2.31) y que cada bloque se encuentre.
 
-## Pendiente (siguiente fase)
-- Dashboards propios para Objetivo 4, Objetivo 5 y Min-Max (hoy usan el render genérico).
+## Objetivos 4 y 5 (dashboards analíticos)
+- `ui/analitica.py` construye las pestañas de cada objetivo a partir de `config/schema.yaml` y `core/mrp_blocks.py`.
+- Objetivo 4: Selección de herramienta · Datos de planificación · Pronóstico de demanda · Planificación MRP (selector de escenario e insumo) · Proveedores · Resultados · Tablas originales.
+- Objetivo 5: Diagnóstico y parámetros · Pronóstico · Política lote por lote · Inventario AS-IS vs TO-BE · Indicadores · Impacto económico · Tablas originales.
+- Cada gráfico se alimenta de una tabla que se muestra debajo. Los cálculos del dashboard se limitan a sumas y conteos, y se indican con un aviso.
+- Las tablas que el esquema no reconoce aparecen en «Tablas originales» con aviso.
+- Los avisos de datos simulados y supuestos salen de frases del propio libro.
+
+## Pendiente
+- Min-Max y Resultados generales siguen con su vista actual (sin cambios en esta versión).
+- Verificación visual real con Streamlit pendiente: en el entorno de desarrollo no hay red para instalarlo; se verificó con stubs y con los datos del libro original.
 - Hojas de Brecha 2/3/4 agrupadas en una sola página con pestañas.
 - Simuladores con controles (ABC, factor de desempeño, umbrales) y comparación con el Excel.
 - Recalcular fórmulas sin valor con LibreOffice (hoy solo avisa).
 - Modo observación (reléer al guardar el archivo).
 - Hojas de fase posterior: Base de datos, Plan.Objetivos, Artículos, Flujo Caja, Conclusiones, Recomendaciones, Anexos, Bibliografía, Asist-Contr.
+
+## Rediseño (versión 2)
+- Navegación por secciones con íconos: Inicio, Empresa y diagnóstico, Selección AHP, Objetivos 2 a 5,
+  Min-Max, Resultados generales, Evaluación económica, Conclusiones y recomendaciones, Explorador y Sincronización.
+  Se edita en `config/menu.yaml`.
+- Barra superior con búsqueda en todo el libro (celda por celda, con la hoja de origen).
+- Tarjetas KPI, avisos cuando un dato no existe en el libro, y descarga CSV de cada tabla.
+- Los datos simulados del propio libro (Objetivos 4 y 5, Min-Max) se marcan como avisos.
+- Hojas vacías (Flujo Caja, Resultados-Indicadores) y encabezados sin texto (Conclusiones, Recomendaciones)
+  se muestran como "no disponible"; no se inventa contenido.
+
+## Despliegue en Streamlit Community Cloud
+1. Sube el repositorio a GitHub con `app.py`, `requirements.txt`, `config/`, `core/`, `ui/`.
+2. Incluye el Excel en `data/source/AvanceT3G55X.xlsx` (o súbelo desde la barra lateral; en la nube
+   el disco se borra al reiniciar, así que para una versión fija conviene incluirlo en el repositorio).
+3. En "New app" elige el repositorio y `app.py` como archivo principal.
